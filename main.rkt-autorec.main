@@ -54,10 +54,6 @@
         )
       )
   ))
-
-
-
-
 (define cfst
   (lambda (p)
     (p (lambda (x) (lambda (y) x)))
@@ -148,11 +144,7 @@
       ( (cnum (lambda (y) ((cmult cnum) (fact (cpred cnum))))) cone))))
   )
 
-(define cdel
-  (lambda (cnum1)
-    (lambda (cnum2)
-      1
-      )))
+
 
         
 ;; moga da naprqvq copy -> filter(lambda x : True, ls)
