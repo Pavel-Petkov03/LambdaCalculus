@@ -7,3 +7,4 @@
 .#*.scm
 *bak
 *.[0-9]
+compiled

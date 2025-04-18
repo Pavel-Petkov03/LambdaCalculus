@@ -44,8 +44,6 @@
       (lambda (x)
         (f ((cnum f) x))))))
 
-
-
 (define cpair
   (lambda (x)
     (lambda (y)
@@ -54,9 +52,6 @@
         )
       )
   ))
-
-
-
 
 (define cfst
   (lambda (p)
@@ -132,19 +127,6 @@
       ((cnum2 (lambda (inner-cnum) (cpred inner-cnum))) cnum1)
     )))
 
-(define Y
-  (lambda (f)
-    ((lambda (x) (f (lambda (y) ((x x) y))))
-     (lambda (x) (f (lambda (y) ((x x) y))))))) ;; y-combinator with delay because of scheme
-
-
-(define cfact
-  (Y (lambda (fact)
-    (lambda (cnum)
-      ( (cnum (lambda (y) ((cmult cnum) (fact (cpred cnum))))) cone))))
-  )
-
-
 (define is-czero
   (lambda (cnum)
     ((cnum (lambda (y) cfalse)) ctrue)
@@ -183,7 +165,6 @@
                  )))
       ))
         
-;; moga da naprqvq copy -> filter(lambda x : True, ls)
 
 (define crem
   (lambda (n)
@@ -199,8 +180,6 @@
          ( ( ( (c< cnum) m) cnum ) ( (csub cnum) m )
          )
       )) n))))
-
-
 
 (define ctwo (number->church 2))
 
