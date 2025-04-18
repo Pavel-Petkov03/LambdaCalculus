@@ -1,4 +1,4 @@
-#lang scheme
+#lang racket
 
 
 (define ctrue
@@ -25,11 +25,11 @@
 (define cand
   (lambda (cpred1)
     (lambda (cpred2)
-      ((ctrue cpred1) cpred2)
+      ( (cpred1 cpred2) cfalse)
       )))
 (define cnot
   (lambda (cpred)
-    (cfalse cpred)
+    ( (cpred cfalse) ctrue)
     ))
 (define cif
   (lambda (cpred)
@@ -60,12 +60,12 @@
 
 (define cfst
   (lambda (p)
-    (p (lambda (x) (lambda (y) x)))
+    (p ctrue)
   ))
 
 (define csnd
   (lambda (p)
-    (p (lambda (x) (lambda (y) y)))
+    (p cfalse)
   ))
 
 
@@ -73,12 +73,15 @@
   ((cnum (lambda (x) (+ 1 x))) 0)
   ) 
 
+(define (repeated F n X)
+  (if (= n 0) X
+      (F (repeated F (- n 1) X))))
  
 (define (number->church num)
-  (if (zero? num)
-      (lambda (f) (lambda (x) x))
-      (lambda (f) (lambda (x) (f (number->church (- num 1))) x))
-  ))
+  (lambda (f)
+    (lambda (x)
+       (repeated f num x))))
+    
 
 (define church->bool
   (lambda (cbool)
@@ -114,13 +117,6 @@
 
 (define czero (lambda (f) (lambda (x) x)))
 (define cone (lambda (f) (lambda (x) (f x))))
-(define ctwo (lambda (f) (lambda (x) (f (f x)))))
-(define cthree ((cadd cone) ctwo))
-(church->number cone)
-(church->number ctwo)
-(church->number cthree)
-(define csix ((cadd cthree) cthree))
-(church->number ((cexp cthree) cthree))
 
 (define cpred
   (lambda (cnum)
@@ -148,14 +144,88 @@
       ( (cnum (lambda (y) ((cmult cnum) (fact (cpred cnum))))) cone))))
   )
 
-(define cdel
+
+(define is-czero
+  (lambda (cnum)
+    ((cnum (lambda (y) cfalse)) ctrue)
+    ))
+
+(define csub
   (lambda (cnum1)
     (lambda (cnum2)
-      1
-      )))
+      ((cnum2 cpred) cnum1)
+      )
+    ))
 
+(define c=
+  (lambda (cnum1)
+    (lambda (cnum2)
+      ((cand (is-czero ((csub cnum1) cnum2))) (is-czero ((csub cnum2) cnum1)))
+    )
+  ))
+
+(define c<
+  (lambda (cnum1)
+    (lambda (cnum2)
+      (cnot (is-czero ( (csub cnum2) cnum1)))
+      )
+    ))
+
+(define cquot
+  (lambda (n)
+    (lambda (m)
+      (csnd ( (n (lambda (p)
+                    ( ( ( (c< (cfst p)) m)
+                       p
+                       ) ( (cpair ( (cminus (cfst p)) m)) (csucc (csnd p)))
+                         )))
+                 ( (cpair n) czero)
+                 )))
+      ))
         
 ;; moga da naprqvq copy -> filter(lambda x : True, ls)
 
+(define crem
+  (lambda (n)
+    (lambda (m)
+       ((csub  n ) ( (cmult ( (cquot n) m)) m) )
+      )))
+
+(define crem2
+  (lambda (n)
+    (lambda (m)
+      ( (n
+       (lambda (cnum)
+         ( ( ( (c< cnum) m) cnum ) ( (csub cnum) m )
+         )
+      )) n))))
 
 
+
+(define ctwo (number->church 2))
+
+(define cprime
+  (lambda (n)
+    (csnd ( ( (cpred (cpred n) ) (lambda (p)
+           ( ( (is-czero ( (crem2 n) (cfst p)))
+             ( (cpair (cfst p)) cfalse)
+         
+         )
+             ( (cpair (csucc (cfst p)) ) ctrue)
+             ))) 
+      ((cpair ctwo) ctrue)
+    ))))
+
+(define cexp2
+  (lambda (cnum1)
+    (lambda (cnum2)
+      ( (cnum2 (lambda (f) ( (cmult cnum1) f) )) cone)
+      )))
+
+(define chyp
+  (lambda (cnum1)
+    (lambda (cnum2)
+      ( (cnum2 (lambda (f) ( (cexp2 cnum1) f) )) cone)
+      )))
+
+(provide (all-defined-out))
