@@ -38,7 +38,7 @@
         ((cpred then) else)
       ))))
 
-(define csucc
+(define cs
   (lambda (cnum)
     (lambda (f)
       (lambda (x)
@@ -88,7 +88,7 @@
       ctrue
       cfalse)
   )
-(define cadd
+(define c+
   (lambda (cnum1)
     (lambda (cnum2)
       (lambda (f)
@@ -96,14 +96,14 @@
           ((cnum2 f) ((cnum1 f) x))
           )))))
 
-(define cmult
+(define c* ; c* (Задача 2.20)
   (lambda (cnum1)
     (lambda (cnum2)
       (lambda (f)
            (cnum2 (cnum1 f))
         ))))
 
-(define cexp
+(define cexp ; не доказвам тази дефиниция в задачата, защото не работи в дъното (доказвам cexp2)
   (lambda (cnum1)
     (lambda (cnum2)
       (cnum2 cnum1)
@@ -113,63 +113,57 @@
 (define czero (lambda (f) (lambda (x) x)))
 (define cone (lambda (f) (lambda (x) (f x))))
 
-(define cpred
+(define cp
   (lambda (cnum)
      (cfst ((cnum (lambda (p) ; (0,0) -> (0,1) -> (b+1, b+2) -> ... (cnum-1 cnum)
-             ( (cpair (csnd p)) (csucc (csnd p)))
+             ( (cpair (csnd p)) (cs (csnd p)))
            ))
      ((cpair czero) czero)))
   ))
-
-(define cminus
-  (lambda (cnum1)
-    (lambda (cnum2)
-      ((cnum2 (lambda (inner-cnum) (cpred inner-cnum))) cnum1)
-    )))
 
 (define is-czero
   (lambda (cnum)
     ((cnum (lambda (y) cfalse)) ctrue)
     ))
 
-(define csub
+(define c-
   (lambda (cnum1)
     (lambda (cnum2)
-      ((cnum2 cpred) cnum1)
+      ((cnum2 cp) cnum1)
       )
     ))
 
-(define c=
+(define c= ; c= (Задача 2.25)
   (lambda (cnum1)
     (lambda (cnum2)
-      ((cand (is-czero ((csub cnum1) cnum2))) (is-czero ((csub cnum2) cnum1)))
+      ((cand (is-czero ((c- cnum1) cnum2))) (is-czero ((c- cnum2) cnum1)))
     )
   ))
 
-(define c<
+(define c< ; c< (Задача 2.25)
   (lambda (cnum1)
     (lambda (cnum2)
-      (cnot (is-czero ( (csub cnum2) cnum1)))
+      (cnot (is-czero ( (c- cnum2) cnum1)))
       )
     ))
 
-(define cquot
+(define cquot ; cquot (Задача 2.26)
   (lambda (n)
     (lambda (m)
       (csnd ( (n (lambda (p)
                     ( ( ( (c< (cfst p)) m)
                        p
-                       ) ( (cpair ( (cminus (cfst p)) m)) (csucc (csnd p)))
+                       ) ( (cpair ( (c- (cfst p)) m)) (cs (csnd p)))
                          )))
                  ( (cpair n) czero)
                  )))
       ))
         
 
-(define crem
+(define crem ; crem (Задача 2.26)
   (lambda (n)
     (lambda (m)
-       ((csub  n ) ( (cmult ( (cquot n) m)) m) )
+       ((c-  n ) ( (c* ( (cquot n) m)) m) )
       )))
 
 (define crem2
@@ -177,31 +171,43 @@
     (lambda (m)
       ( (n
        (lambda (cnum)
-         ( ( ( (c< cnum) m) cnum ) ( (csub cnum) m )
+         ( ( ( (c< cnum) m) cnum ) ( (c- cnum) m )
          )
       )) n))))
 
 (define ctwo (number->church 2))
 
-(define cprime
+(define c/ ; c/ (Задача 2.27)
+  (lambda (m)
+    (lambda (n)
+      (is-czero ( (crem n) m))
+      )
+    ))
+
+(define cprime-iter
   (lambda (n)
-    (csnd ( ( (cpred (cpred n) ) (lambda (p)
-           ( ( (is-czero ( (crem2 n) (cfst p)))
+    (csnd ( ( (cp (cp n) ) (lambda (p)
+           ( ( ( (c/ (cfst p)) n)
              ( (cpair (cfst p)) cfalse)
          
          )
-             ( (cpair (csucc (cfst p)) ) ctrue)
+             ( (cpair (cs (cfst p)) ) ctrue)
              ))) 
       ((cpair ctwo) ctrue)
     ))))
 
-(define cexp2
+(define cprime ; cprime (Задача 2.27)
+  (lambda (n)
+    ( (( (c= n) czero) cfalse) ( ( ( (c= n) cone) cfalse) (cprime-iter n)) )
+    ))
+
+(define cexp2 ; cexp (Задача 2.20)
   (lambda (cnum1)
     (lambda (cnum2)
-      ( (cnum2 (lambda (f) ( (cmult cnum1) f) )) cone)
+      ( (cnum2 (lambda (f) ( (c* cnum1) f) )) cone)
       )))
 
-(define chyp
+(define chyp ; chyp (Задача 2.20)
   (lambda (cnum1)
     (lambda (cnum2)
       ( (cnum2 (lambda (f) ( (cexp2 cnum1) f) )) cone)

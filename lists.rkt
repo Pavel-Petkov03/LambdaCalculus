@@ -13,9 +13,6 @@
     )
   ))
 
-(define chead cfst)
-(define ctail csnd)
- 
 (define cnil
   (lambda (c)
     (lambda (x)
@@ -85,7 +82,7 @@
              ( (ccons (cconvert h)) t)
            )
        ))
-       cnil )
+       cnil)
     )))
 
 (define (church->list clist)
@@ -95,5 +92,13 @@
          (cons (church->number h) t))
        ))
    '()))
+(define cfrom-cto ; дава числата от cstart + 1 до cend включително
+  (lambda (cstart)
+    (lambda (cend)
+      ( cfst ( ( ( (c- cend) cstart) (lambda (f) ( (cpair ( (ccons (csnd f)) (cfst f))) (cp (csnd f))) )) ( (cpair cnil) cend)))
+    )))
 
-(define cl ((ccons cone) ((ccons (number->church 15)) cnil)))
+(define test-clist ( (cfrom-cto (number->church 55)) (number->church 70)))
+; (church->list test-clist) '(56 57 58 59 60 61 62 63 64 65 66 67 68 69 70)
+(cmap csucc)
+
