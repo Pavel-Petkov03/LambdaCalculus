@@ -29,7 +29,7 @@
            (cs x)
            )
          )
-             ) czero)
+             ) c0)
     )
   )
 
@@ -92,22 +92,22 @@
          (cons (church->number h) t))
        ))
    '()))
-(define cfrom-cto ; дава числата от cstart + 1 до cend включително
+(define cfrom-cto ; дава числата от cstart до cend
   (lambda (cstart)
     (lambda (cend)
-      ( cfst ( ( ( (c- cend) cstart) (lambda (f) ( (cpair ( (ccons (csnd f)) (cfst f))) (cp (csnd f))) )) ( (cpair cnil) cend)))
+      ( cfst ( ( ( (c- cend) cstart) (lambda (f) ( (cpair ( (ccons (csnd f)) (cfst f))) (cp (csnd f))) )) ( (cpair cnil) (cp cend))))
     )))
 
 (define test-clist ( (cfrom-cto (number->church 55)) (number->church 70)))
-; (church->list test-clist) '(56 57 58 59 60 61 62 63 64 65 66 67 68 69 70)
+; (church->list test-clist) '(55 56 57 58 59 60 61 62 63 64 65 66 67 68 69)
 (define incremented-test-list ( (cmap cs ) test-clist))
-; (church->list incremented-test-list) '(57 58 59 60 61 62 63 64 65 66 67 68 69 70 71)
+; (church->list incremented-test-list) '(56 57 58 59 60 61 62 63 64 65 66 67 68 69 70)
 (define filtered-less-than-65 ( (cfilter (lambda (n) ( (c< n) (number->church 65)))) test-clist) )
-; (church->list filtered-less-than-65)) '(56 57 58 59 60 61 62 63 64)
-(define added-nums ( ( (cfoldr c+) czero) test-clist) )
-; (church->number added-nums) 945
+; (church->list filtered-less-than-65)) '(55 56 57 58 59 60 61 62 63 64)
+(define added-nums ( ( (cfoldr c+) c0) test-clist) )
+; (church->number added-nums) 930
 (define concatenate-same ( (cappend test-clist) test-clist))
-; (church->list concatenate-same) '(56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70)
+; (church->list concatenate-same) '(55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69)
 (define test-clist-length (clength  test-clist))
 ; (church->number test-clist-length) 15
 (define is-32-in-test ( ( (cmember? (number->church 32)) test-clist) c=))

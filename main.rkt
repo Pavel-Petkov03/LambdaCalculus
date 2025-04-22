@@ -110,18 +110,18 @@
       )
     ))
 
-(define czero (lambda (f) (lambda (x) x)))
-(define cone (lambda (f) (lambda (x) (f x))))
+(define c0 (lambda (f) (lambda (x) x)))
+(define c1 (lambda (f) (lambda (x) (f x))))
 
 (define cp
   (lambda (cnum)
      (cfst ((cnum (lambda (p) ; (0,0) -> (0,1) -> (b+1, b+2) -> ... (cnum-1 cnum)
              ( (cpair (csnd p)) (cs (csnd p)))
            ))
-     ((cpair czero) czero)))
+     ((cpair c0) c0)))
   ))
 
-(define is-czero
+(define c=0
   (lambda (cnum)
     ((cnum (lambda (y) cfalse)) ctrue)
     ))
@@ -136,14 +136,14 @@
 (define c= ; c= (Задача 2.25)
   (lambda (cnum1)
     (lambda (cnum2)
-      ((cand (is-czero ((c- cnum1) cnum2))) (is-czero ((c- cnum2) cnum1)))
+      ((cand (c=0 ((c- cnum1) cnum2))) (c=0 ((c- cnum2) cnum1)))
     )
   ))
 
 (define c< ; c< (Задача 2.25)
   (lambda (cnum1)
     (lambda (cnum2)
-      (cnot (is-czero ( (c- cnum2) cnum1)))
+      (cnot (c=0 ( (c- cnum2) cnum1)))
       )
     ))
 
@@ -155,7 +155,7 @@
                        p
                        ) ( (cpair ( (c- (cfst p)) m)) (cs (csnd p)))
                          )))
-                 ( (cpair n) czero)
+                 ( (cpair n) c0)
                  )))
       ))
         
@@ -175,12 +175,12 @@
          )
       )) n))))
 
-(define ctwo (number->church 2))
+(define c2 (number->church 2))
 
 (define c/ ; c/ (Задача 2.27)
   (lambda (m)
     (lambda (n)
-      (is-czero ( (crem n) m))
+      (c=0 ( (crem n) m))
       )
     ))
 
@@ -193,24 +193,24 @@
          )
              ( (cpair (cs (cfst p)) ) ctrue)
              ))) 
-      ((cpair ctwo) ctrue)
+      ((cpair c2) ctrue)
     ))))
 
 (define cprime ; cprime (Задача 2.27)
   (lambda (n)
-    ( (( (c= n) czero) cfalse) ( ( ( (c= n) cone) cfalse) (cprime-iter n)) )
+    ( (( (c= n) c0) cfalse) ( ( ( (c= n) c1) cfalse) (cprime-iter n)) )
     ))
 
 (define cexp2 ; cexp (Задача 2.20)
   (lambda (cnum1)
     (lambda (cnum2)
-      ( (cnum2 (lambda (f) ( (c* cnum1) f) )) cone)
+      ( (cnum2 (lambda (f) ( (c* cnum1) f) )) c1)
       )))
 
 (define chyp ; chyp (Задача 2.20)
   (lambda (cnum1)
     (lambda (cnum2)
-      ( (cnum2 (lambda (f) ( (cexp2 cnum1) f) )) cone)
+      ( (cnum2 (lambda (f) ( (cexp2 cnum1) f) )) c1)
       )))
 
 (provide (all-defined-out))
