@@ -160,3 +160,4 @@ current = Abstraction(
 
 comb = ToCombinatorEncoder()
 print(comb.encode(current))
+print("going to refactor")
